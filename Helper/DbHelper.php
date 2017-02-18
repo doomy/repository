@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Repository\Helper;
+namespace Doomy\Repository\Helper;
 
 class DbHelper
 {

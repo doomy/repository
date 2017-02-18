@@ -1,9 +1,9 @@
 <?php
 
-namespace Repository;
+namespace Doomy\Repository;
 
-use Repository\Model\EntityFactory;
-use Repository\Helper\DbHelper;
+use Doomy\Repository\Model\EntityFactory;
+use Doomy\Repository\Helper\DbHelper;
 
 class Repository
 {

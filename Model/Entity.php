@@ -1,8 +1,8 @@
 <?php
 
-namespace Repository\Model;
+namespace Doomy\Repository\Model;
 
-use Repository\RepoFactory;
+use Doomy\Repository\RepoFactory;
 
 abstract class Entity
 {
