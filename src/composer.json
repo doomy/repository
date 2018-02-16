@@ -1,9 +1,9 @@
 {
     "name": "doomy/repository",
-    "version": "1.0.5",
+    "version": "1.0.4",
     "autoload": {
         "psr-0" : {
-            "Doomy\\Repository" : "src"
+            "Doomy\\Repository" : ""
         }
     },
     "require": {
