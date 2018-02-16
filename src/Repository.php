@@ -2,8 +2,8 @@
 
 namespace Doomy\Repository;
 
-use Doomy\Repository\Model\EntityFactory;
 use Doomy\Repository\Helper\DbHelper;
+use Doomy\CustomDibi\Connection;
 
 class Repository
 {
@@ -16,7 +16,7 @@ class Repository
 
     public $connection;
 
-    public function __construct($entityClass, $connection, EntityFactory $entityFactory) {
+    public function __construct($entityClass, Connection $connection, EntityFactory $entityFactory) {
         $this->entityFactory = $entityFactory;
         $this->table = $entityClass::TABLE;
         $this->view = $entityClass::VIEW ? $entityClass::VIEW : $entityClass::TABLE;
@@ -30,7 +30,7 @@ class Repository
         $where = DbHelper::translateWhere($where);
         $orderBy = $orderBy ? $orderBy : "{$this->identityColumn} ASC";
         $sql = "SELECT * FROM {$this->view} WHERE $where ORDER BY $orderBy";
-        if ($limit) $sql .= "LIMIT $limit";
+        if ($limit) $sql .= " LIMIT $limit";
         $result = $this->connection->query($sql);
         $rows = $result->fetchAll();
         $entities = [];
@@ -42,7 +42,7 @@ class Repository
     }
 
     public function findOne($where = null, $orderBy = null) {
-        $all = $this->findAll($where, $orderBy);
+        $all = $this->findAll($where, $orderBy, 1);
         return array_shift($all);
     }
 
@@ -80,6 +80,7 @@ class Repository
             return $this->entityFactory->createEntity($this->entityClass, $values);
         }
         else {
+            unset($values[$this->identityColumn]);
             $newId = $this->add($values);
             $values[$this->identityColumn] = $newId;
             $entity = $this->entityFactory->createEntity($this->entityClass, $values);

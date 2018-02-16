@@ -2,9 +2,6 @@
 
 namespace Doomy\Repository;
 
-use Doomy\Repository\Repository;
-use Doomy\Repository\Model\EntityFactory;
-
 class RepoFactory
 {
     private $connection;
