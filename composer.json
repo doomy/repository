@@ -1,13 +1,13 @@
 {
     "name": "doomy/repository",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "autoload": {
       "classmap": ["src/"]
     },
     "require": {
 		"php": ">= 5.6",
 		"dibi/dibi": "*",
-        "doomy/CustomDibi": ">= 1.0.0"
+        "doomy/CustomDibi": ">= 1.0.2"
 	},
 	"minimum-stability": "stable"
 }
