@@ -24,6 +24,10 @@ class Repository
         $this->connection = $connection;
         $this->sequence = $entityClass::SEQUENCE;
         $this->entityClass = $entityClass;
+
+        if ((!$this->connection->tableExists($entityClass::TABLE)) && !empty($entityClass::getTableDefinition())) {
+            $this->connection->query(DbHelper::getCreateTable($entityClass::getTableDefinition()));
+        }
     }
 
     public function findAll($where = null, $orderBy = null, $limit = null) {

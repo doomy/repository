@@ -3,6 +3,8 @@
 
 namespace Doomy\Repository\Helper;
 
+use Doomy\Repository\Model\TableDefinition;
+
 class DbHelper
 {
     public static function translateWhere($where) {
@@ -77,4 +79,23 @@ class DbHelper
         return $name;
     }
 
+    public static function getCreateTable(TableDefinition $definition) {
+        $definitionCode = static::getColumnsCode($definition->getColumns());
+
+        if (!empty($definition->getPrimaryKey())) {
+            $definitionCode .= ", PRIMARY KEY({$definition->getPrimaryKey()})";
+        }
+
+        return "CREATE TABLE {$definition->getTableName()} ($definitionCode);";
+    }
+
+    public static function getColumnsCode($columns) {
+        $columnCodes = [];
+
+        foreach ($columns as $columnName => $definition) {
+            $columnCodes[] = "$columnName $definition";
+        }
+
+        return implode(", ", $columnCodes);
+    }
 }

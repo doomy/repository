@@ -10,12 +10,18 @@ abstract class Entity
     const VIEW = NULL;
     const SEQUENCE = NULL;
     const IDENTITY_COLUMN = 'ID';
+    const PRIMARY_KEY = NULL;
+
     protected $created = false;
     private $repoFactory;
+    protected static $columns = [];
+    protected static $tableDefinition;
 
     public function __construct($values, RepoFactory $repoFactory)
     {
         if (!$values) return false;
+
+        $this->initColumns();
 
         foreach ($values as $key => $value) {
             $uKey = strtoupper($key);
@@ -37,6 +43,14 @@ abstract class Entity
         return $this->created;
     }
 
+    public static function getTableDefinition() {
+        if (empty(static::$columns) || empty(static::TABLE)) return NULL;
+
+        if (!empty(static::$tableDefinition)) return static::$tableDefinition;
+
+        return static::$tableDefinition = new TableDefinition(static::TABLE, static::$columns, static::PRIMARY_KEY);
+    }
+
     protected function getRepository($entityClass)
     {
         return $this->repoFactory->getRepository($entityClass);
@@ -56,5 +70,12 @@ abstract class Entity
         $repository = $this->getRepository($entityClass);
         $where = array_merge($where, [$propertyName => $entityId]);
         return $repository->findAll($where, $orderBy);
+    }
+
+    private function initColumns() {
+        foreach(static::$columns as $key => $definition) {
+            $uKey = strtoupper($key);
+            $this->$uKey = NULL;
+        }
     }
 }
