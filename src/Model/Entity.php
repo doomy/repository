@@ -52,7 +52,7 @@ abstract class Entity
     }
 
     public function getIdentity() {
-        return $this->{self::IDENTITY_COLUMN}();
+        return $this->{static::IDENTITY_COLUMN};
     }
 
     protected function getRepository($entityClass)
