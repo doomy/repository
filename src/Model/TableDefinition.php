@@ -2,9 +2,6 @@
 
 namespace Doomy\Repository\Model;
 
-
-use Doomy\Repository\Helper\DbHelper;
-
 class TableDefinition
 {
     private $columns;
