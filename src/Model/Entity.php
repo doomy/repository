@@ -51,6 +51,10 @@ abstract class Entity
         return static::$tableDefinition = new TableDefinition(static::TABLE, static::$columns, static::PRIMARY_KEY);
     }
 
+    public function getIdentity() {
+        return $this->{self::IDENTITY_COLUMN}();
+    }
+
     protected function getRepository($entityClass)
     {
         return $this->repoFactory->getRepository($entityClass);
