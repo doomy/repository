@@ -66,7 +66,11 @@ class Repository
 
     public function add($values) {
         $this->connection->query("INSERT INTO {$this->table}", $values);
-        return @$this->connection->getInsertId();
+        try {
+            return @$this->connection->getInsertId();
+        } catch (Exception $e) {
+            return NULL;
+        }
     }
 
     public function update($id, $values) {
