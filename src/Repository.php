@@ -68,7 +68,7 @@ class Repository
         $this->connection->query("INSERT INTO {$this->table}", $values);
         try {
             return @$this->connection->getInsertId();
-        } catch (Exception $e) {
+        } catch (\Dibi\Exception $e) {
             return NULL;
         }
     }
