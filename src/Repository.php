@@ -88,7 +88,8 @@ class Repository
             return $this->entityFactory->createEntity($this->entityClass, $values);
         }
         else {
-            unset($values[$this->identityColumn]);
+            // TODO: why was this here? We should allow identity column override
+            // unset($values[$this->identityColumn]);
             $newId = $this->add($values);
             $values[$this->identityColumn] = $newId;
             $entity = $this->entityFactory->createEntity($this->entityClass, $values);
