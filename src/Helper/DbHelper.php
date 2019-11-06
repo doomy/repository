@@ -15,7 +15,7 @@ class DbHelper
         $whereParts = [];
         foreach($where as $columnName => $expected) {
             if (!is_array(($expected))) {
-                if ($expected[0] == "~") {
+                if (is_string($expected) && ($expected[0] == "~")) {
                     $whereParts[] = static::getLikeExpression($columnName, substr($expected, 1));
                 }
                 else if (is_null($expected)) {
