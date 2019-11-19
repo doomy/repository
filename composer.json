@@ -1,11 +1,12 @@
 {
     "name": "doomy/repository",
-    "version": "2.0.1",
+    "version": "3.0.0",
+    "description": "simple data model framework for dataprovider service",
     "autoload": {
       "classmap": ["src/"]
     },
     "require": {
-		"php": ">= 5.6",
+		"php": ">= 7",
 		"dibi/dibi": "*",
         "doomy/CustomDibi": ">= 1.0.2"
 	},

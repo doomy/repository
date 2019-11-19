@@ -2,6 +2,7 @@
 
 namespace Doomy\Repository\Model;
 
+use App\Helper\StringTools;
 use Doomy\Repository\RepoFactory;
 
 abstract class Entity
@@ -84,8 +85,27 @@ abstract class Entity
     }
 
     public function __toArray(){
-        return call_user_func('get_object_vars', $this);
+        $array = [];
+        $properties = call_user_func('get_object_vars', $this);
+        foreach ($properties as $key => $value) {
+            if (StringTools::isAllCaps($key)) {
+                $array[$key] = $value;
+            }
+        }
+        return $array;
     }
+
+    public static function getFields(): array
+    {
+        $fields = [];
+        foreach (get_class_vars(static::class) as $key => $default) {
+            if (StringTools::isAllCaps($key)) {
+                $fields[] = $key;
+            }
+        }
+        return $fields;
+    }
+
 
     public function __toString()
     {
