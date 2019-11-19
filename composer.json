@@ -7,7 +7,7 @@
     },
     "require": {
 		"php": ">= 7",
-		"dibi/dibi": "^3.0",
+		"dibi/dibi": ">=3.0",
         "doomy/CustomDibi": "^1.0.2",
         "doomy/stringtools": "^1.0.1"
 	},
