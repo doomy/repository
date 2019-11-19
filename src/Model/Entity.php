@@ -2,7 +2,7 @@
 
 namespace Doomy\Repository\Model;
 
-use App\Helper\StringTools;
+use Doomy\Helper\StringTools;
 use Doomy\Repository\RepoFactory;
 
 abstract class Entity
