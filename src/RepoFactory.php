@@ -2,13 +2,15 @@
 
 namespace Doomy\Repository;
 
+use Doomy\CustomDibi\Connection;
+
 class RepoFactory
 {
     private $connection;
     private $entityFactory;
     private $repositories;
 
-    public function __construct($connection, EntityFactory $entityFactory) {
+    public function __construct(Connection $connection, EntityFactory $entityFactory) {
         $this->connection = $connection;
         $this->entityFactory = $entityFactory;
     }
