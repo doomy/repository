@@ -9,7 +9,7 @@
 		"php": ">= 7.4",
 		"dibi/dibi": ">=3.0",
         "doomy/CustomDibi": "^1.0.2",
-        "doomy/stringtools": "^1.0.1"
+        "doomy/stringtools": "^2.0.0"git
 	},
 	"minimum-stability": "stable"
 }

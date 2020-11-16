@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "214241eaf3c5264f43d5edeccec0ace9",
+    "content-hash": "0d84fc226327c735ff03536552423495",
     "packages": [
         {
             "name": "dibi/dibi",
-            "version": "v4.1.3",
+            "version": "v4.1.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dg/dibi.git",
-                "reference": "ed2a82741993706c15dbd4f5b8dd7eb5b75f7aa2"
+                "reference": "0d2f643795734aa9b6310d90324473da0dd2f9d2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dg/dibi/zipball/ed2a82741993706c15dbd4f5b8dd7eb5b75f7aa2",
-                "reference": "ed2a82741993706c15dbd4f5b8dd7eb5b75f7aa2",
+                "url": "https://api.github.com/repos/dg/dibi/zipball/0d2f643795734aa9b6310d90324473da0dd2f9d2",
+                "reference": "0d2f643795734aa9b6310d90324473da0dd2f9d2",
                 "shasum": ""
             },
             "require": {
@@ -27,6 +27,7 @@
                 "dg/dibi": "*"
             },
             "require-dev": {
+                "nette/di": "^3.0",
                 "nette/tester": "~2.0",
                 "phpstan/phpstan": "^0.12",
                 "tracy/tracy": "~2.2"
@@ -69,7 +70,7 @@
                 "sqlite",
                 "sqlsrv"
             ],
-            "time": "2020-03-26T03:10:39+00:00"
+            "time": "2020-11-02T14:27:54+00:00"
         },
         {
             "name": "doomy/customdibi",
@@ -100,21 +101,21 @@
         },
         {
             "name": "doomy/stringtools",
-            "version": "1.0.1",
+            "version": "2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doomy/stringtools.git",
-                "reference": "6b9cd82e94580a0e0cc3b66429ed77d37e93099b"
+                "reference": "778d1ad96a7cb3de74b05a177eb4fea2cff6f51c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doomy/stringtools/zipball/6b9cd82e94580a0e0cc3b66429ed77d37e93099b",
-                "reference": "6b9cd82e94580a0e0cc3b66429ed77d37e93099b",
+                "url": "https://api.github.com/repos/doomy/stringtools/zipball/778d1ad96a7cb3de74b05a177eb4fea2cff6f51c",
+                "reference": "778d1ad96a7cb3de74b05a177eb4fea2cff6f51c",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
-                "php": ">= 7"
+                "php": ">= 7.1"
             },
             "type": "library",
             "autoload": {
@@ -127,7 +128,7 @@
                 "MIT"
             ],
             "description": "Simple helper library for various string operations",
-            "time": "2019-11-19T17:59:30+00:00"
+            "time": "2020-11-16T09:38:52+00:00"
         }
     ],
     "packages-dev": [],
@@ -137,7 +138,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">= 7"
+        "php": ">= 7.4"
     },
     "platform-dev": [],
     "plugin-api-version": "1.1.0"
