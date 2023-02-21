@@ -29,7 +29,7 @@ class DbHelper
             }
             else {
                 foreach ($expected as &$expectedValue) {
-                    $expectedValueEscaped = static::escapeSingleQuote($expectedValueEscaped);
+                    $expectedValueEscaped = static::escapeSingleQuote($expectedValue);
                     $expectedValue = "'$expectedValueEscaped'"; // escape
                 }
                 $expectedCode = implode(", ", $expected);
