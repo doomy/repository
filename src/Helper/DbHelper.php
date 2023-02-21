@@ -16,16 +16,21 @@ class DbHelper
         foreach($where as $columnName => $expected) {
             if (!is_array(($expected))) {
                 if (is_string($expected) && ($expected[0] == "~")) {
-                    $whereParts[] = static::getLikeExpression($columnName, substr($expected, 1));
+                    $likeExpected = substr($expected, 1);
+                    $whereParts[] = static::getLikeExpression($columnName, static::escapeSingleQuote(substr($expected, 1)));
                 }
                 else if (is_null($expected)) {
                     $whereParts[] = "`$columnName` IS NULL";
                 }
-                else $whereParts[] = "`$columnName` = '$expected'";
+                else {
+                    $escapedExpected = static::escapeSingleQuote($expected);
+                    $whereParts[] = "`$columnName` = '$escapedExpected'";
+                }
             }
             else {
                 foreach ($expected as &$expectedValue) {
-                    $expectedValue = "'$expectedValue'"; // escape
+                    $expectedValueEscaped = static::escapeSingleQuote($expectedValueEscaped);
+                    $expectedValue = "'$expectedValueEscaped'"; // escape
                 }
                 $expectedCode = implode(", ", $expected);
                 $whereParts[] = "$columnName IN ($expectedCode)";
@@ -97,5 +102,10 @@ class DbHelper
         }
 
         return implode(", ", $columnCodes);
+    }
+
+    private static function escapeSingleQuote(string $string): string
+    {
+        return str_replace("'", "''", $string);
     }
 }
