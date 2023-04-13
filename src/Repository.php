@@ -2,6 +2,7 @@
 
 namespace Doomy\Repository;
 
+use Dibi\Exception;
 use Doomy\Repository\Helper\DbHelper;
 use Doomy\CustomDibi\Connection;
 
@@ -67,9 +68,9 @@ class Repository
     public function add($values) {
         $this->connection->query("INSERT INTO {$this->table}", $values);
         try {
-            return @$this->connection->getInsertId();
-        } catch (\Dibi\Exception $e) {
-            return NULL;
+            return $this->connection->getInsertId();
+        } catch (Exception) {
+            return $values[$this->identityColumn];
         }
     }
 
