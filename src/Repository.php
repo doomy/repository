@@ -65,12 +65,21 @@ class Repository
         return $values ? $entity : false;
     }
 
-    public function add($values) {
+    /**
+     * @param array<string, mixed> $values
+     * @return int|string|null
+     */
+    public function add(array $values): mixed
+    {
         $this->connection->query("INSERT INTO {$this->table}", $values);
         try {
             return $this->connection->getInsertId();
         } catch (Exception) {
-            return $values[$this->identityColumn];
+            if (isset($values[$this->identityColumn])) {
+                return $values[$this->identityColumn];
+            }
+
+            return null;
         }
     }
 
