@@ -43,14 +43,10 @@ readonly class Repository
 
     /**
      * @param string|array<string,mixed>|null $where
-     * @param string|array<string,mixed>|null $orderBy
      * @return T[]
      */
-    public function findAll(
-        string|array|null $where = null,
-        string|array|null $orderBy = null,
-        ?int $limit = null
-    ): array {
+    public function findAll(string|array|null $where = null, ?string $orderBy = null, ?int $limit = null): array
+    {
         $where = $this->dbHelper->translateWhere($where);
         $orderBy = $orderBy ? $orderBy : "{$this->identityColumn} ASC";
         $sql = "SELECT * FROM {$this->view} WHERE {$where} ORDER BY {$orderBy}";
@@ -69,10 +65,9 @@ readonly class Repository
 
     /**
      * @param array<string, mixed>|string|null $where
-     * @param array<string, mixed>|string|null $orderBy
      * @return T|null
      */
-    public function findOne(array|string|null $where = null, array|string|null $orderBy = null): Entity|null
+    public function findOne(array|string|null $where = null, ?string $orderBy = null): Entity|null
     {
         $all = $this->findAll($where, $orderBy, 1);
         return array_shift($all);
@@ -83,7 +78,9 @@ readonly class Repository
      */
     public function findById(int|string $id): ?Entity
     {
-        return $this->findBy($this->identityColumn, $id);
+        /** @var T|null $entity */
+        $entity = $this->findBy($this->identityColumn, $id);
+        return $entity;
     }
 
     /**

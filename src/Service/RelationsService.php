@@ -15,7 +15,8 @@ final readonly class RelationsService
     }
 
     /**
-     * @param class-string $entityClass
+     * @template T of Entity
+     * @param class-string<T> $entityClass
      */
     public function get11Relation(string $entityClass, string|int $entityId, ?string $propertyName = null): Entity
     {
@@ -29,9 +30,9 @@ final readonly class RelationsService
     }
 
     /**
-     * @param class-string $entityClass
+     * @template T of Entity
+     * @param class-string<T> $entityClass
      * @param array<string, mixed> $where
-     * @param mixed[]|string|null $orderBy
      * @return Entity[]
      */
     public function get1NRelation(
@@ -39,7 +40,7 @@ final readonly class RelationsService
         string $propertyName,
         string|int|null $entityId = null,
         array $where = [],
-        array|string|null $orderBy = null
+        string|null $orderBy = null
     ): array {
         if ($entityId === null) {
             $entityId = $this->{$entityClass::IDENTITY_COLUMN};

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doomy\Repository\Helper;
 
+use Dibi\Row;
 use Doomy\Repository\Model\TableDefinition;
 
 final readonly class DbHelper
@@ -86,7 +87,7 @@ final readonly class DbHelper
      * @param mixed[] $row
      * @return mixed[]
      */
-    public static function convertRowKeysToUppercase(array $row)
+    public static function convertRowKeysToUppercase(array|Row $row): array
     {
         foreach ($row as $key => $value) {
             $uKey = strtoupper($key);
@@ -101,7 +102,7 @@ final readonly class DbHelper
             unset($row[$lKey]);
         }
 
-        return $row;
+        return $row instanceof Row ? $row->toArray() : $row;
     }
 
     public static function normalizeNameFromDB(string $name): string

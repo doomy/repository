@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doomy\Repository;
 
+use Dibi\Row;
 use Doomy\Repository\Model\Entity;
 
 readonly class EntityFactory
@@ -18,9 +19,12 @@ readonly class EntityFactory
      * @param array<string,mixed> $values
      * @return T
      */
-    public function createEntity(string $entityClass, array $values): Entity
+    public function createEntity(string $entityClass, array|Row $values): Entity
     {
-        // TODO: avoid sending repofactory to entity instances
+        if ($values instanceof Row) {
+            $values = $values->toArray();
+        }
+
         return new $entityClass($values);
     }
 }
