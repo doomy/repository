@@ -9,6 +9,9 @@ use Doomy\CustomDibi\Connection;
 use Doomy\Repository\Helper\DbHelper;
 use Doomy\Repository\Model\Entity;
 
+/**
+ * @template T of Entity
+ */
 readonly class Repository
 {
     private ?string $view;
@@ -20,7 +23,7 @@ readonly class Repository
     private string $identityColumn;
 
     /**
-     * @param class-string $entityClass
+     * @param class-string<T> $entityClass
      */
     public function __construct(
         private string $entityClass,
@@ -41,7 +44,7 @@ readonly class Repository
     /**
      * @param string|array<string,mixed>|null $where
      * @param string|array<string,mixed>|null $orderBy
-     * @return Entity[]
+     * @return T[]
      */
     public function findAll(
         string|array|null $where = null,
@@ -67,6 +70,7 @@ readonly class Repository
     /**
      * @param array<string, mixed>|string|null $where
      * @param array<string, mixed>|string|null $orderBy
+     * @return T|null
      */
     public function findOne(array|string|null $where = null, array|string|null $orderBy = null): Entity|null
     {
@@ -74,11 +78,17 @@ readonly class Repository
         return array_shift($all);
     }
 
+    /**
+     * @return T|null
+     */
     public function findById(int|string $id): ?Entity
     {
         return $this->findBy($this->identityColumn, $id);
     }
 
+    /**
+     * @return T|false
+     */
     public function findBy(string $name, int|string $value): Entity|false
     {
         $q = "SELECT * FROM {$this->view} WHERE {$name}='{$value}'";
@@ -116,6 +126,7 @@ readonly class Repository
 
     /**
      * @param array<string, mixed> $values
+     * @return T
      */
     public function save(array $values): Entity
     {

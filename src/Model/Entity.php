@@ -23,9 +23,9 @@ abstract class Entity
     /**
      * @var array<string, string>
      */
-    protected array $columns = [];
+    protected static array $columns = [];
 
-    protected TableDefinition $tableDefinition;
+    protected static TableDefinition $tableDefinition;
 
     /**
      * @param array<string, mixed> $values
@@ -72,17 +72,17 @@ abstract class Entity
         return $this->created;
     }
 
-    public function getTableDefinition(): ?TableDefinition
+    public static function getTableDefinition(): ?TableDefinition
     {
-        if (empty($this->columns) || empty(static::TABLE)) {
+        if (empty(static::$columns) || empty(static::TABLE)) {
             return null;
         }
 
-        if (! empty($this->tableDefinition)) {
-            return $this->tableDefinition;
+        if (! empty(static::$tableDefinition)) {
+            return static::$tableDefinition;
         }
 
-        return $this->tableDefinition = new TableDefinition(static::TABLE, $this->columns, static::PRIMARY_KEY);
+        return static::$tableDefinition = new TableDefinition(static::TABLE, static::$columns, static::PRIMARY_KEY);
     }
 
     public function getIdentity(): ?string

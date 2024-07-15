@@ -6,11 +6,12 @@ namespace Doomy\Repository;
 
 use Doomy\CustomDibi\Connection;
 use Doomy\Repository\Helper\DbHelper;
+use Doomy\Repository\Model\Entity;
 
 class RepoFactory
 {
     /**
-     * @var Repository[]
+     * @var array<class-string<Entity>, Repository<Entity>>
      */
     private array $repositories;
 
@@ -22,7 +23,9 @@ class RepoFactory
     }
 
     /**
-     * @param class-string $entityClass
+     * @template T of Entity
+     * @param class-string<T> $entityClass
+     * @return Repository<T>
      */
     public function getRepository(string $entityClass): Repository
     {
@@ -34,6 +37,9 @@ class RepoFactory
                 $this->dbHelper
             );
         }
-        return $this->repositories[$entityClass];
+
+        /** @var Repository<T> $repository */
+        $repository = $this->repositories[$entityClass];
+        return $repository;
     }
 }
