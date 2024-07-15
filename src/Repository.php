@@ -77,7 +77,7 @@ readonly class Repository
     /**
      * @return T|null
      */
-    public function findById(int|string $id): ?Entity
+    public function findById(string|int $id): ?Entity
     {
         /** @var T|null $entity */
         $entity = $this->findBy($this->identityColumn, $id);
@@ -87,13 +87,16 @@ readonly class Repository
     /**
      * @return T|false
      */
-    public function findBy(string $name, int|string $value): Entity|false
+    public function findBy(string $name, string|int $value): Entity|false
     {
         $q = "SELECT * FROM {$this->view} WHERE {$name}='{$value}'";
         $result = $this->connection->query($q);
-        /** @var array<string,mixed> $all */
         $all = $result->fetchAll();
         $values = array_shift($all);
+        if ($values === null) {
+            return false;
+        }
+
         $entity = $this->entityFactory->createEntity($this->entityClass, $values);
         return $values ? $entity : false;
     }
@@ -101,7 +104,7 @@ readonly class Repository
     /**
      * @param array<string, mixed> $values
      */
-    public function add(array $values): int|null
+    public function add(array $values): mixed
     {
         $this->connection->query("INSERT INTO {$this->table}", $values);
         try {
@@ -132,7 +135,9 @@ readonly class Repository
         $values = $this->prepareValues($values);
 
         if (isset($values[$this->identityColumn]) && $values[$this->identityColumn]) {
-            $entity = $this->findById($values[$this->identityColumn]);
+            /** @var int|string $id */
+            $id = $values[$this->identityColumn];
+            $entity = $this->findById($id);
         }
 
         if (isset($entity)) {

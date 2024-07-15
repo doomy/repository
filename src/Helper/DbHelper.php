@@ -24,26 +24,28 @@ final readonly class DbHelper
 
         $whereParts = [];
         foreach ($where as $columnName => $expected) {
-            if (! is_array(($expected))) {
+            if (is_string(($expected))) {
                 if (is_string($expected) && ($expected[0] === '~')) {
                     $likeExpected = substr($expected, 1);
                     $whereParts[] = static::getLikeExpression(
                         $columnName,
                         $this->escapeSingleQuote(substr($expected, 1))
                     );
-                } elseif ($expected === null) {
-                    $whereParts[] = "`{$columnName}` IS NULL";
-                } else {
+                } elseif (is_string($expected)) {
                     $escapedExpected = $this->escapeSingleQuote($expected);
                     $whereParts[] = "`{$columnName}` = '{$escapedExpected}'";
                 }
-            } else {
+            } elseif ($expected === null) {
+                $whereParts[] = "`{$columnName}` IS NULL";
+            } elseif (is_array($expected)) {
                 foreach ($expected as &$expectedValue) {
                     $expectedValueEscaped = $this->escapeSingleQuote($expectedValue);
                     $expectedValue = "'{$expectedValueEscaped}'"; // escape
                 }
                 $expectedCode = implode(', ', $expected);
                 $whereParts[] = "{$columnName} IN ({$expectedCode})";
+            } else {
+                throw new \LogicException('Unexpected where condition format');
             }
         }
 
