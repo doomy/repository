@@ -6,9 +6,9 @@ namespace Doomy\Repository\Helper;
 
 use Doomy\Repository\Model\TableDefinition;
 
-class DbHelper
+final readonly class DbHelper
 {
-    public static function translateWhere($where)
+    public function translateWhere($where)
     {
         if (! $where) {
             return '1 = 1';
@@ -25,17 +25,17 @@ class DbHelper
                     $likeExpected = substr($expected, 1);
                     $whereParts[] = static::getLikeExpression(
                         $columnName,
-                        static::escapeSingleQuote(substr($expected, 1))
+                        $this->escapeSingleQuote(substr($expected, 1))
                     );
                 } elseif ($expected === null) {
                     $whereParts[] = "`{$columnName}` IS NULL";
                 } else {
-                    $escapedExpected = static::escapeSingleQuote($expected);
+                    $escapedExpected = $this->escapeSingleQuote($expected);
                     $whereParts[] = "`{$columnName}` = '{$escapedExpected}'";
                 }
             } else {
                 foreach ($expected as &$expectedValue) {
-                    $expectedValueEscaped = static::escapeSingleQuote($expectedValue);
+                    $expectedValueEscaped = $this->escapeSingleQuote($expectedValue);
                     $expectedValue = "'{$expectedValueEscaped}'"; // escape
                 }
                 $expectedCode = implode(', ', $expected);
@@ -52,10 +52,10 @@ class DbHelper
         return implode(' AND ', $whereParts);
     }
 
-    public static function getMultiWhere($whereArray)
+    public function getMultiWhere($whereArray)
     {
         foreach ($whereArray as $key => $wherePart) {
-            $whereArray[$key] = self::translateWhere($wherePart);
+            $whereArray[$key] = $this->translateWhere($wherePart);
         }
 
         foreach ($whereArray as $key => $part) {
@@ -124,7 +124,7 @@ class DbHelper
         return implode(', ', $columnCodes);
     }
 
-    private static function escapeSingleQuote(string $string): string
+    private function escapeSingleQuote(string $string): string
     {
         return str_replace("'", "''", $string);
     }

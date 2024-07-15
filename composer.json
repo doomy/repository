@@ -6,13 +6,14 @@
       "classmap": ["src/"]
     },
     "require": {
-		"php": ">= 7.4",
+		"php": ">=8.2",
 		"dibi/dibi": ">=3.0",
         "doomy/customdibi": "^1.0.2",
         "doomy/stringtools": "^2.0.0"
 	},
 	"minimum-stability": "stable",
     "require-dev": {
-        "symplify/easy-coding-standard": "^12.3"
+        "symplify/easy-coding-standard": "^12.3",
+        "phpstan/phpstan": "^1.11"
     }
 }

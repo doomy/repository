@@ -10,8 +10,6 @@ use Doomy\Repository\Helper\DbHelper;
 
 class Repository
 {
-    public $connection;
-
     private $view;
 
     private $table;
@@ -20,28 +18,25 @@ class Repository
 
     private $identityColumn;
 
-    private $entityClass;
-
-    private $entityFactory;
-
-    public function __construct($entityClass, Connection $connection, EntityFactory $entityFactory)
-    {
-        $this->entityFactory = $entityFactory;
+    public function __construct(
+        private readonly string $entityClass,
+        private readonly Connection $connection,
+        private readonly EntityFactory $entityFactory,
+        private readonly DbHelper $dbHelper
+    ) {
         $this->table = $entityClass::TABLE;
         $this->view = $entityClass::VIEW ? $entityClass::VIEW : $entityClass::TABLE;
         $this->identityColumn = $entityClass::IDENTITY_COLUMN;
-        $this->connection = $connection;
         $this->sequence = $entityClass::SEQUENCE;
-        $this->entityClass = $entityClass;
 
         if ((! $this->connection->tableExists($entityClass::TABLE)) && ! empty($entityClass::getTableDefinition())) {
-            $this->connection->query(DbHelper::getCreateTable($entityClass::getTableDefinition()));
+            $this->connection->query($this->dbHelper->getCreateTable($entityClass::getTableDefinition()));
         }
     }
 
     public function findAll($where = null, $orderBy = null, $limit = null)
     {
-        $where = DbHelper::translateWhere($where);
+        $where = $this->dbHelper->translateWhere($where);
         $orderBy = $orderBy ? $orderBy : "{$this->identityColumn} ASC";
         $sql = "SELECT * FROM {$this->view} WHERE {$where} ORDER BY {$orderBy}";
         if ($limit) {
@@ -51,7 +46,7 @@ class Repository
         $rows = $result->fetchAll();
         $entities = [];
         foreach ($rows as $row) {
-            $row = DbHelper::convertRowKeysToUppercase($row);
+            $row = $this->dbHelper->convertRowKeysToUppercase($row);
             $entities[$row[$this->identityColumn]] = $this->entityFactory->createEntity($this->entityClass, $row);
         }
         return $entities;
@@ -137,13 +132,13 @@ class Repository
     {
         $entityClass = $this->entityClass;
         $this->delete([
-                $entityClass::IDENTITY_COLUMN => $id,
-            ]);
+            $entityClass::IDENTITY_COLUMN => $id,
+        ]);
     }
 
     public function delete($where)
     {
-        $where = DbHelper::translateWhere($where);
+        $where = $this->dbHelper->translateWhere($where);
         $this->connection->query("DELETE FROM {$this->table} WHERE {$where}");
     }
 
