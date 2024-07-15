@@ -10,9 +10,9 @@ use Doomy\Repository\Model\TableDefinition;
 final readonly class DbHelper
 {
     /**
-     * @param mixed[]|string $where
+     * @param array<string, mixed>|string|null $where
      */
-    public function translateWhere(array|string $where): string
+    public function translateWhere(array|string|null $where): string
     {
         if (! $where) {
             return '1 = 1';

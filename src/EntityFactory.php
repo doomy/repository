@@ -16,7 +16,7 @@ readonly class EntityFactory
     /**
      * @template T of Entity
      * @param class-string<T> $entityClass
-     * @param array<string,mixed> $values
+     * @param array<string,mixed>|Row $values
      * @return T
      */
     public function createEntity(string $entityClass, array|Row $values): Entity

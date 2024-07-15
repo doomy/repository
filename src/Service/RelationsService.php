@@ -18,7 +18,7 @@ final readonly class RelationsService
      * @template T of Entity
      * @param class-string<T> $entityClass
      */
-    public function get11Relation(string $entityClass, string|int $entityId, ?string $propertyName = null): Entity
+    public function get11Relation(string $entityClass, string|int $entityId, ?string $propertyName = null): ?Entity
     {
         $repository = $this->repoFactory->getRepository($entityClass);
         if (! $propertyName) {

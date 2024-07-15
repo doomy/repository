@@ -8,6 +8,7 @@ use Dibi\Exception;
 use Doomy\CustomDibi\Connection;
 use Doomy\Repository\Helper\DbHelper;
 use Doomy\Repository\Model\Entity;
+use Doomy\Repository\Model\TableDefinition;
 
 /**
  * @template T of Entity
@@ -36,8 +37,8 @@ readonly class Repository
         $this->identityColumn = $entityClass::IDENTITY_COLUMN;
         $this->sequence = $entityClass::SEQUENCE;
 
-        if ((! $this->connection->tableExists($entityClass::TABLE)) && ! empty($entityClass::getTableDefinition())) {
-            $this->connection->query($this->dbHelper->getCreateTable($entityClass::getTableDefinition()));
+        if ((! $this->connection->tableExists($entityClass::TABLE))) {
+            $this->tryInitTable($entityClass);
         }
     }
 
@@ -90,6 +91,7 @@ readonly class Repository
     {
         $q = "SELECT * FROM {$this->view} WHERE {$name}='{$value}'";
         $result = $this->connection->query($q);
+        /** @var array<string,mixed> $all */
         $all = $result->fetchAll();
         $values = array_shift($all);
         $entity = $this->entityFactory->createEntity($this->entityClass, $values);
@@ -191,5 +193,18 @@ readonly class Repository
         }
 
         return $values;
+    }
+
+    /**
+     * @param class-string<T> $entityClass
+     */
+    private function tryInitTable(string $entityClass): void
+    {
+        $tableDefinition = $entityClass::getTableDefinition();
+        if (! $tableDefinition instanceof TableDefinition) {
+            return;
+        }
+
+        $this->connection->query($this->dbHelper->getCreateTable($tableDefinition));
     }
 }
