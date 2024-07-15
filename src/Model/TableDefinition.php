@@ -1,15 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doomy\Repository\Model;
 
 class TableDefinition
 {
     private $columns;
+
     private $primaryKey;
+
     private $tableName;
 
-
-    public function __construct($tableName, $columns, $primaryKey = NULL)
+    public function __construct($tableName, $columns, $primaryKey = null)
     {
         $this->tableName = $tableName;
         $this->columns = $columns;
@@ -26,7 +29,8 @@ class TableDefinition
         return $this->primaryKey;
     }
 
-    public function getTableName() {
+    public function getTableName()
+    {
         return $this->tableName;
     }
 }
