@@ -9,8 +9,11 @@ readonly class TableDefinition
     /**
      * @param array<string, string> $columns
      */
-    public function __construct(private string $tableName, private array $columns, private ?string $primaryKey = null)
-    {
+    public function __construct(
+        private string $tableName,
+        private array $columns,
+        private ?string $primaryKey = null
+    ) {
     }
 
     /**

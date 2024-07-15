@@ -10,7 +10,7 @@ use Doomy\Repository\Helper\DbHelper;
 class RepoFactory
 {
     /**
-     * @var Repository[] $repositories
+     * @var Repository[]
      */
     private array $repositories;
 

@@ -21,7 +21,6 @@ readonly class Repository
 
     /**
      * @param class-string $entityClass
-     * @throws Exception
      */
     public function __construct(
         private string $entityClass,
@@ -43,14 +42,12 @@ readonly class Repository
      * @param string|array<string,mixed>|null $where
      * @param string|array<string,mixed>|null $orderBy
      * @return Entity[]
-     * @throws Exception
      */
     public function findAll(
         string|array|null $where = null,
         string|array|null $orderBy = null,
         ?int $limit = null
-    ): array
-    {
+    ): array {
         $where = $this->dbHelper->translateWhere($where);
         $orderBy = $orderBy ? $orderBy : "{$this->identityColumn} ASC";
         $sql = "SELECT * FROM {$this->view} WHERE {$where} ORDER BY {$orderBy}";
@@ -70,7 +67,6 @@ readonly class Repository
     /**
      * @param array<string, mixed>|string|null $where
      * @param array<string, mixed>|string|null $orderBy
-     * @throws Exception
      */
     public function findOne(array|string|null $where = null, array|string|null $orderBy = null): Entity|null
     {
@@ -112,7 +108,6 @@ readonly class Repository
 
     /**
      * @param array<string,mixed> $values
-     * @throws Exception
      */
     public function update(int|string $id, array $values): void
     {
@@ -121,7 +116,6 @@ readonly class Repository
 
     /**
      * @param array<string, mixed> $values
-     * @throws Exception
      */
     public function save(array $values): Entity
     {
@@ -162,7 +156,6 @@ readonly class Repository
 
     /**
      * @param array<string, mixed>|string $where
-     * @throws Exception
      */
     public function delete(array|string $where): void
     {

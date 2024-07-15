@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Doomy\Repository\Model;
 
 use Doomy\Helper\StringTools;
-use Doomy\Repository\RepoFactory;
-use Doomy\Repository\Repository;
 
 abstract class Entity
 {
@@ -31,9 +29,8 @@ abstract class Entity
 
     /**
      * @param array<string, mixed> $values
-     * @param RepoFactory $repoFactory
      */
-    public function __construct(array $values, private readonly RepoFactory $repoFactory)
+    public function __construct(array $values)
     {
         $this->initColumns();
 
@@ -105,52 +102,6 @@ abstract class Entity
             }
         }
         return $fields;
-    }
-
-    /**
-     * @param class-string $entityClass
-     */
-    protected function getRepository(string $entityClass): Repository
-    {
-        return $this->repoFactory->getRepository($entityClass);
-    }
-
-    /**
-     * @param class-string $entityClass
-     */
-    protected function get11Relation(string $entityClass, string|int $entityId, ?string $propertyName = null): Entity
-    {
-        $repository = $this->repoFactory->getRepository($entityClass);
-        if (! $propertyName) {
-            return $repository->findById($entityId);
-        }
-        return $repository->findOne([
-            $propertyName => $entityId,
-        ]);
-    }
-
-    /**
-     * @param class-string $entityClass
-     * @param array<string, mixed> $where
-     * @param mixed[]|string|null $orderBy
-     * @return Entity[]
-     */
-    protected function get1NRelation(
-        string $entityClass,
-        string $propertyName,
-        string|int|null $entityId = null,
-        array $where = [],
-        array|string|null $orderBy = null
-    ): array
-    {
-        if ($entityId === null) {
-            $entityId = $this->{static::IDENTITY_COLUMN};
-        }
-        $repository = $this->getRepository($entityClass);
-        $where = array_merge($where, [
-            $propertyName => $entityId,
-        ]);
-        return $repository->findAll($where, $orderBy);
     }
 
     private function initColumns(): void
