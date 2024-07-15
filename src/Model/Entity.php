@@ -30,7 +30,7 @@ abstract class Entity
     public function __construct($values, RepoFactory $repoFactory)
     {
         if (! $values) {
-            return false;
+            return;
         }
 
         $this->initColumns();
