@@ -6,7 +6,7 @@
       "classmap": ["src/"]
     },
     "require": {
-		"php": ">=8.2",
+		"php": ">=8.3",
 		"dibi/dibi": ">=3.0",
         "doomy/customdibi": "^1.0.2",
         "doomy/stringtools": "^2.0.0"

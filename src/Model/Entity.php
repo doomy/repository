@@ -6,33 +6,35 @@ namespace Doomy\Repository\Model;
 
 use Doomy\Helper\StringTools;
 use Doomy\Repository\RepoFactory;
+use Doomy\Repository\Repository;
 
 abstract class Entity
 {
-    public const TABLE = null;
+    public const ?string TABLE = null;
 
-    public const VIEW = null;
+    public const ?string VIEW = null;
 
-    public const SEQUENCE = null;
+    public const ?string SEQUENCE = null;
 
-    public const IDENTITY_COLUMN = 'ID';
+    public const string IDENTITY_COLUMN = 'ID';
 
-    public const PRIMARY_KEY = null;
+    public const ?string PRIMARY_KEY = null;
 
-    protected $created = false;
+    protected bool $created = false;
 
-    protected static $columns = [];
+    /**
+     * @var array<string, string>
+     */
+    protected array $columns = [];
 
-    protected static $tableDefinition;
+    protected TableDefinition $tableDefinition;
 
-    private $repoFactory;
-
-    public function __construct($values, RepoFactory $repoFactory)
+    /**
+     * @param array<string, mixed> $values
+     * @param RepoFactory $repoFactory
+     */
+    public function __construct(array $values, private readonly RepoFactory $repoFactory)
     {
-        if (! $values) {
-            return;
-        }
-
         $this->initColumns();
 
         foreach ($values as $key => $value) {
@@ -41,11 +43,12 @@ abstract class Entity
                 $this->{$uKey} = $value;
             }
         }
-
-        $this->repoFactory = $repoFactory;
     }
 
-    public function __toArray()
+    /**
+     * @return array<string, mixed>
+     */
+    public function __toArray(): array
     {
         $array = [];
         $properties = call_user_func('get_object_vars', $this);
@@ -57,39 +60,42 @@ abstract class Entity
         return $array;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return '';
     }
 
-    public function setCreated($bool)
+    public function setCreated(bool $created): void
     {
-        $this->created = $bool;
+        $this->created = $created;
     }
 
-    public function wasCreated()
+    public function wasCreated(): bool
     {
         return $this->created;
     }
 
-    public static function getTableDefinition()
+    public function getTableDefinition(): ?TableDefinition
     {
-        if (empty(static::$columns) || empty(static::TABLE)) {
+        if (empty($this->columns) || empty(static::TABLE)) {
             return null;
         }
 
-        if (! empty(static::$tableDefinition)) {
-            return static::$tableDefinition;
+        if (! empty($this->tableDefinition)) {
+            return $this->tableDefinition;
         }
 
-        return static::$tableDefinition = new TableDefinition(static::TABLE, static::$columns, static::PRIMARY_KEY);
+        return $this->tableDefinition = new TableDefinition(static::TABLE, $this->columns, static::PRIMARY_KEY);
     }
 
-    public function getIdentity()
+    public function getIdentity(): ?string
     {
         return $this->{static::IDENTITY_COLUMN};
     }
 
+    /**
+     * @return mixed[]
+     */
     public static function getFields(): array
     {
         $fields = [];
@@ -101,12 +107,18 @@ abstract class Entity
         return $fields;
     }
 
-    protected function getRepository($entityClass)
+    /**
+     * @param class-string $entityClass
+     */
+    protected function getRepository(string $entityClass): Repository
     {
         return $this->repoFactory->getRepository($entityClass);
     }
 
-    protected function get11Relation($entityClass, $entityId, $propertyName = null)
+    /**
+     * @param class-string $entityClass
+     */
+    protected function get11Relation(string $entityClass, string|int $entityId, ?string $propertyName = null): Entity
     {
         $repository = $this->repoFactory->getRepository($entityClass);
         if (! $propertyName) {
@@ -117,7 +129,19 @@ abstract class Entity
         ]);
     }
 
-    protected function get1NRelation($entityClass, $propertyName, $entityId = null, $where = [], $orderBy = null)
+    /**
+     * @param class-string $entityClass
+     * @param array<string, mixed> $where
+     * @param mixed[]|string|null $orderBy
+     * @return Entity[]
+     */
+    protected function get1NRelation(
+        string $entityClass,
+        string $propertyName,
+        string|int|null $entityId = null,
+        array $where = [],
+        array|string|null $orderBy = null
+    ): array
     {
         if ($entityId === null) {
             $entityId = $this->{static::IDENTITY_COLUMN};
@@ -129,9 +153,9 @@ abstract class Entity
         return $repository->findAll($where, $orderBy);
     }
 
-    private function initColumns()
+    private function initColumns(): void
     {
-        foreach (static::$columns as $key => $definition) {
+        foreach ($this->columns as $key => $definition) {
             $uKey = strtoupper($key);
             $this->{$uKey} = null;
         }

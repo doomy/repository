@@ -7,22 +7,27 @@ namespace Doomy\Repository;
 use Dibi\Exception;
 use Doomy\CustomDibi\Connection;
 use Doomy\Repository\Helper\DbHelper;
+use Doomy\Repository\Model\Entity;
 
-class Repository
+readonly class Repository
 {
-    private $view;
+    private ?string $view;
 
-    private $table;
+    private ?string $table;
 
-    private $sequence;
+    private ?string $sequence;
 
-    private $identityColumn;
+    private string $identityColumn;
 
+    /**
+     * @param class-string $entityClass
+     * @throws Exception
+     */
     public function __construct(
-        private readonly string $entityClass,
-        private readonly Connection $connection,
-        private readonly EntityFactory $entityFactory,
-        private readonly DbHelper $dbHelper
+        private string $entityClass,
+        private Connection $connection,
+        private EntityFactory $entityFactory,
+        private DbHelper $dbHelper
     ) {
         $this->table = $entityClass::TABLE;
         $this->view = $entityClass::VIEW ? $entityClass::VIEW : $entityClass::TABLE;
@@ -34,7 +39,17 @@ class Repository
         }
     }
 
-    public function findAll($where = null, $orderBy = null, $limit = null)
+    /**
+     * @param string|array<string,mixed>|null $where
+     * @param string|array<string,mixed>|null $orderBy
+     * @return Entity[]
+     * @throws Exception
+     */
+    public function findAll(
+        string|array|null $where = null,
+        string|array|null $orderBy = null,
+        ?int $limit = null
+    ): array
     {
         $where = $this->dbHelper->translateWhere($where);
         $orderBy = $orderBy ? $orderBy : "{$this->identityColumn} ASC";
@@ -52,21 +67,23 @@ class Repository
         return $entities;
     }
 
-    public function findOne($where = null, $orderBy = null)
+    /**
+     * @param array<string, mixed>|string|null $where
+     * @param array<string, mixed>|string|null $orderBy
+     * @throws Exception
+     */
+    public function findOne(array|string|null $where = null, array|string|null $orderBy = null): Entity|null
     {
         $all = $this->findAll($where, $orderBy, 1);
         return array_shift($all);
     }
 
-    public function findById($id)
+    public function findById(int|string $id): ?Entity
     {
-        if ($id === null) {
-            return false;
-        }
         return $this->findBy($this->identityColumn, $id);
     }
 
-    public function findBy($name, $value)
+    public function findBy(string $name, int|string $value): Entity|false
     {
         $q = "SELECT * FROM {$this->view} WHERE {$name}='{$value}'";
         $result = $this->connection->query($q);
@@ -78,9 +95,8 @@ class Repository
 
     /**
      * @param array<string, mixed> $values
-     * @return int|string|null
      */
-    public function add(array $values): mixed
+    public function add(array $values): int|null
     {
         $this->connection->query("INSERT INTO {$this->table}", $values);
         try {
@@ -89,17 +105,25 @@ class Repository
             if (isset($values[$this->identityColumn])) {
                 return $values[$this->identityColumn];
             }
-
-            return null;
         }
+
+        return null;
     }
 
-    public function update($id, $values)
+    /**
+     * @param array<string,mixed> $values
+     * @throws Exception
+     */
+    public function update(int|string $id, array $values): void
     {
         $this->connection->query("UPDATE {$this->table} SET ", $values, "WHERE {$this->identityColumn} = '{$id}'");
     }
 
-    public function save($values)
+    /**
+     * @param array<string, mixed> $values
+     * @throws Exception
+     */
+    public function save(array $values): Entity
     {
         $values = $this->prepareValues($values);
 
@@ -107,7 +131,7 @@ class Repository
             $entity = $this->findById($values[$this->identityColumn]);
         }
 
-        if (isset($entity) && $entity) {
+        if (isset($entity)) {
             $this->update($entity->{$this->identityColumn}, $values);
             return $this->entityFactory->createEntity($this->entityClass, $values);
         }
@@ -122,13 +146,13 @@ class Repository
 
     }
 
-    public function getNextId()
+    public function getNextId(): mixed
     {
         $result = $this->connection->query("SELECT {$this->sequence}.nextval FROM DUAL");
         return $result->fetchSingle();
     }
 
-    public function deleteById($id)
+    public function deleteById(int|string $id): void
     {
         $entityClass = $this->entityClass;
         $this->delete([
@@ -136,22 +160,27 @@ class Repository
         ]);
     }
 
-    public function delete($where)
+    /**
+     * @param array<string, mixed>|string $where
+     * @throws Exception
+     */
+    public function delete(array|string $where): void
     {
         $where = $this->dbHelper->translateWhere($where);
         $this->connection->query("DELETE FROM {$this->table} WHERE {$where}");
     }
 
-    private function isDatabaseProperty($name)
+    private function isDatabaseProperty(string $name): bool
     {
         return $name === strtoupper($name);
     }
 
-    private function prepareValues($values)
+    /**
+     * @param array<string,mixed> $values
+     * @return array<string, mixed>
+     */
+    private function prepareValues(array $values)
     {
-        if (! is_array($values)) {
-            $values = (array) $values;
-        }
         foreach ($values as $key => $value) {
             if (! $this->isDatabaseProperty($key)) {
                 unset($values[$key]);

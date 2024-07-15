@@ -8,7 +8,10 @@ use Doomy\Repository\Model\TableDefinition;
 
 final readonly class DbHelper
 {
-    public function translateWhere($where)
+    /**
+     * @param mixed[]|string $where
+     */
+    public function translateWhere(array|string $where): string
     {
         if (! $where) {
             return '1 = 1';
@@ -52,7 +55,10 @@ final readonly class DbHelper
         return implode(' AND ', $whereParts);
     }
 
-    public function getMultiWhere($whereArray)
+    /**
+     * @param array<string, string> $whereArray
+     */
+    public function getMultiWhere(array $whereArray): string
     {
         foreach ($whereArray as $key => $wherePart) {
             $whereArray[$key] = $this->translateWhere($wherePart);
@@ -67,7 +73,7 @@ final readonly class DbHelper
         return implode(' AND ', $whereArray);
     }
 
-    public static function getLikeExpression($columnName, $expected)
+    public static function getLikeExpression(string $columnName, ?string $expected): ?string
     {
         if (! $expected) {
             return null;
@@ -76,7 +82,11 @@ final readonly class DbHelper
         return "{$columnName} LIKE '%{$expected}%'";
     }
 
-    public static function convertRowKeysToUppercase($row)
+    /**
+     * @param mixed[] $row
+     * @return mixed[]
+     */
+    public static function convertRowKeysToUppercase(array $row)
     {
         foreach ($row as $key => $value) {
             $uKey = strtoupper($key);
@@ -94,7 +104,7 @@ final readonly class DbHelper
         return $row;
     }
 
-    public static function normalizeNameFromDB($name)
+    public static function normalizeNameFromDB(string $name): string
     {
         $name = str_replace('_', ' ', $name);
         $name = ucfirst(strtolower($name));
@@ -102,7 +112,7 @@ final readonly class DbHelper
         return $name;
     }
 
-    public static function getCreateTable(TableDefinition $definition)
+    public static function getCreateTable(TableDefinition $definition): string
     {
         $definitionCode = static::getColumnsCode($definition->getColumns());
 
@@ -113,7 +123,10 @@ final readonly class DbHelper
         return "CREATE TABLE {$definition->getTableName()} ({$definitionCode});";
     }
 
-    public static function getColumnsCode($columns)
+    /**
+     * @param array<string, string> $columns
+     */
+    public static function getColumnsCode(array $columns): string
     {
         $columnCodes = [];
 

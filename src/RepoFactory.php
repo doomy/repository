@@ -9,6 +9,9 @@ use Doomy\Repository\Helper\DbHelper;
 
 class RepoFactory
 {
+    /**
+     * @var Repository[] $repositories
+     */
     private array $repositories;
 
     public function __construct(
@@ -18,7 +21,10 @@ class RepoFactory
     ) {
     }
 
-    public function getRepository($entityClass)
+    /**
+     * @param class-string $entityClass
+     */
+    public function getRepository(string $entityClass): Repository
     {
         if (! isset($this->repositories[$entityClass])) {
             $this->repositories[$entityClass] = new Repository(
