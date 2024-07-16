@@ -2,29 +2,30 @@
 
 declare(strict_types=1);
 
-namespace Doomy\Repository\Model;
+namespace Doomy\Repository\TableDefinition;
 
 readonly class TableDefinition
 {
     /**
-     * @param array<string, string> $columns
+     * @param Column[] $columns
      */
     public function __construct(
         private string $tableName,
         private array $columns,
-        private ?string $primaryKey = null
+        private ?Column $primaryKey = null,
+        private ?Column $identityColumn = null,
     ) {
     }
 
     /**
-     * @return array<string,string>
+     * @return Column[]
      */
     public function getColumns(): array
     {
         return $this->columns;
     }
 
-    public function getPrimaryKey(): ?string
+    public function getPrimaryKey(): ?Column
     {
         return $this->primaryKey;
     }
@@ -32,5 +33,10 @@ readonly class TableDefinition
     public function getTableName(): string
     {
         return $this->tableName;
+    }
+
+    public function getIdentityColumn(): ?Column
+    {
+        return $this->identityColumn;
     }
 }

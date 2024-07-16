@@ -7,6 +7,7 @@ namespace Doomy\Repository;
 use Doomy\CustomDibi\Connection;
 use Doomy\Repository\Helper\DbHelper;
 use Doomy\Repository\Model\Entity;
+use Doomy\Repository\TableDefinition\TableDefinitionFactory;
 
 class RepoFactory
 {
@@ -18,7 +19,8 @@ class RepoFactory
     public function __construct(
         private readonly Connection $connection,
         private readonly EntityFactory $entityFactory,
-        private readonly DbHelper $dbHelper
+        private readonly DbHelper $dbHelper,
+        private readonly TableDefinitionFactory $tableDefinitionFactory
     ) {
     }
 
@@ -34,7 +36,8 @@ class RepoFactory
                 $entityClass,
                 $this->connection,
                 $this->entityFactory,
-                $this->dbHelper
+                $this->dbHelper,
+                $this->tableDefinitionFactory
             );
         }
 

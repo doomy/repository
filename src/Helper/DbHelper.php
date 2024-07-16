@@ -4,11 +4,18 @@ declare(strict_types=1);
 
 namespace Doomy\Repository\Helper;
 
-use Dibi\Row;
-use Doomy\Repository\Model\TableDefinition;
+use Doomy\Repository\TableDefinition\Column;
+use Doomy\Repository\TableDefinition\ColumnType;
+use Doomy\Repository\TableDefinition\ColumnTypeMapper;
+use Doomy\Repository\TableDefinition\TableDefinition;
 
 final readonly class DbHelper
 {
+    public function __construct(
+        private ColumnTypeMapper $columnTypeMapper
+    ) {
+    }
+
     /**
      * @param array<string, mixed>|string|null $where
      */
@@ -26,7 +33,6 @@ final readonly class DbHelper
         foreach ($where as $columnName => $expected) {
             if (is_string(($expected))) {
                 if (is_string($expected) && ($expected[0] === '~')) {
-                    $likeExpected = substr($expected, 1);
                     $whereParts[] = static::getLikeExpression(
                         $columnName,
                         $this->escapeSingleQuote(substr($expected, 1))
@@ -85,56 +91,43 @@ final readonly class DbHelper
         return "{$columnName} LIKE '%{$expected}%'";
     }
 
-    /**
-     * @param mixed[] $row
-     * @return mixed[]
-     */
-    public static function convertRowKeysToUppercase(array|Row $row): array
-    {
-        foreach ($row as $key => $value) {
-            $uKey = strtoupper($key);
-            $row[$uKey] = $value;
-        }
-
-        foreach ($row as $key => $value) {
-            if (! ctype_lower($key)) {
-                continue;
-            }
-            $lKey = strtolower($key);
-            unset($row[$lKey]);
-        }
-
-        return $row instanceof Row ? $row->toArray() : $row;
-    }
-
-    public static function normalizeNameFromDB(string $name): string
-    {
-        $name = str_replace('_', ' ', $name);
-        $name = ucfirst(strtolower($name));
-
-        return $name;
-    }
-
-    public static function getCreateTable(TableDefinition $definition): string
+    public function getCreateTable(TableDefinition $definition): string
     {
         $definitionCode = static::getColumnsCode($definition->getColumns());
 
         if (! empty($definition->getPrimaryKey())) {
-            $definitionCode .= ", PRIMARY KEY({$definition->getPrimaryKey()})";
+            $definitionCode .= ", PRIMARY KEY({$definition->getPrimaryKey()
+                ->getName()})";
         }
 
         return "CREATE TABLE {$definition->getTableName()} ({$definitionCode});";
     }
 
     /**
-     * @param array<string, string> $columns
+     * @param Column[] $columns
      */
-    public static function getColumnsCode(array $columns): string
+    public function getColumnsCode(array $columns): string
     {
         $columnCodes = [];
 
-        foreach ($columns as $columnName => $definition) {
-            $columnCodes[] = "{$columnName} {$definition}";
+        foreach ($columns as $column) {
+            $typeTranslated = $this->columnTypeMapper->mapToMysqlString($column->getColumnType());
+
+            if ($column->getLength() !== null) {
+                $columnDefinition = "{$typeTranslated}({$column->getLength()})";
+            } else {
+                $columnDefinition = $typeTranslated;
+            }
+
+            if ($column->isIdentity() && $column->getColumnType() === ColumnType::INTEGER) {
+                $columnDefinition .= ' NOT NULL AUTO_INCREMENT';
+            } elseif (! $column->isNullable()) {
+                $columnDefinition .= ' NOT NULL';
+            } else {
+                $columnDefinition .= ' NULL';
+            }
+
+            $columnCodes[] = "{$column->getName()} {$columnDefinition}";
         }
 
         return implode(', ', $columnCodes);

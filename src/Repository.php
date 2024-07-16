@@ -8,7 +8,7 @@ use Dibi\Exception;
 use Doomy\CustomDibi\Connection;
 use Doomy\Repository\Helper\DbHelper;
 use Doomy\Repository\Model\Entity;
-use Doomy\Repository\Model\TableDefinition;
+use Doomy\Repository\TableDefinition\TableDefinitionFactory;
 
 /**
  * @template T of Entity
@@ -19,8 +19,6 @@ readonly class Repository
 
     private ?string $table;
 
-    private ?string $sequence;
-
     private string $identityColumn;
 
     /**
@@ -30,16 +28,19 @@ readonly class Repository
         private string $entityClass,
         private Connection $connection,
         private EntityFactory $entityFactory,
-        private DbHelper $dbHelper
+        private DbHelper $dbHelper,
+        private TableDefinitionFactory $tableDefinitionFactory
     ) {
-        $this->table = $entityClass::TABLE;
-        $this->view = $entityClass::VIEW ? $entityClass::VIEW : $entityClass::TABLE;
-        $this->identityColumn = $entityClass::IDENTITY_COLUMN;
-        $this->sequence = $entityClass::SEQUENCE;
+        $tableDefinition = $this->tableDefinitionFactory->createTableDefinition($entityClass);
 
-        if ((! $this->connection->tableExists($entityClass::TABLE))) {
-            $this->tryInitTable($entityClass);
+        $this->table = $this->view = $tableDefinition->getTableName();
+
+        if ($tableDefinition->getIdentityColumn() === null) {
+            throw new \Exception('Identity column not found in table definition');
         }
+
+        $this->identityColumn = $tableDefinition->getIdentityColumn()
+            ->getName();
     }
 
     /**
@@ -58,7 +59,6 @@ readonly class Repository
         $rows = $result->fetchAll();
         $entities = [];
         foreach ($rows as $row) {
-            $row = $this->dbHelper->convertRowKeysToUppercase($row);
             $entities[$row[$this->identityColumn]] = $this->entityFactory->createEntity($this->entityClass, $row);
         }
         return $entities;
@@ -132,8 +132,6 @@ readonly class Repository
      */
     public function save(array $values): Entity
     {
-        $values = $this->prepareValues($values);
-
         if (isset($values[$this->identityColumn]) && $values[$this->identityColumn]) {
             /** @var int|string $id */
             $id = $values[$this->identityColumn];
@@ -144,25 +142,15 @@ readonly class Repository
             $this->update($entity->{$this->identityColumn}, $values);
             return $this->entityFactory->createEntity($this->entityClass, $values);
         }
-
-        // TODO: why was this here? We should allow identity column override
-        // unset($values[$this->identityColumn]);
         $newId = $this->add($values);
         $values[$this->identityColumn] = $newId;
         return $this->entityFactory->createEntity($this->entityClass, $values);
     }
 
-    public function getNextId(): mixed
-    {
-        $result = $this->connection->query("SELECT {$this->sequence}.nextval FROM DUAL");
-        return $result->fetchSingle();
-    }
-
     public function deleteById(int|string $id): void
     {
-        $entityClass = $this->entityClass;
         $this->delete([
-            $entityClass::IDENTITY_COLUMN => $id,
+            $this->identityColumn => $id,
         ]);
     }
 
@@ -173,40 +161,5 @@ readonly class Repository
     {
         $where = $this->dbHelper->translateWhere($where);
         $this->connection->query("DELETE FROM {$this->table} WHERE {$where}");
-    }
-
-    private function isDatabaseProperty(string $name): bool
-    {
-        return $name === strtoupper($name);
-    }
-
-    /**
-     * @param array<string,mixed> $values
-     * @return array<string, mixed>
-     */
-    private function prepareValues(array $values)
-    {
-        foreach ($values as $key => $value) {
-            if (! $this->isDatabaseProperty($key)) {
-                unset($values[$key]);
-            }
-            /* elseif($value instanceof \DateTime)
-                 $values[$key] = date_format($value, DateConfig::DB_DATE_FORMAT); */
-        }
-
-        return $values;
-    }
-
-    /**
-     * @param class-string<T> $entityClass
-     */
-    private function tryInitTable(string $entityClass): void
-    {
-        $tableDefinition = $entityClass::getTableDefinition();
-        if (! $tableDefinition instanceof TableDefinition) {
-            return;
-        }
-
-        $this->connection->query($this->dbHelper->getCreateTable($tableDefinition));
     }
 }

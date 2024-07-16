@@ -3,7 +3,10 @@
     "description": "simple data model framework for dataprovider service",
     "license": "MIT",
     "autoload": {
-      "classmap": ["src/"]
+        "classmap": ["src/"],
+        "psr-4": {
+            "Doomy\\Repository\\Tests\\": "tests/"
+        }
     },
     "require": {
 		"php": ">=8.3",
@@ -14,9 +17,10 @@
 	"minimum-stability": "stable",
     "require-dev": {
         "symplify/easy-coding-standard": "^12.3",
-        "phpstan/phpstan": "^1.11"
+        "phpstan/phpstan": "^1.11",
+        "phpunit/phpunit": "^11.2"
     },
     "scripts": {
-      "check": "php vendor/bin/phpstan analyse src --level 9 && php vendor/bin/ecs --fix"
+      "check": "php vendor/bin/phpstan analyse src --level 9 && php vendor/bin/ecs --fix && php vendor/phpunit/phpunit/phpunit tests --bootstrap vendor/autoload.php --colors --stop-on-error --stop-on-failure"
     }
 }
