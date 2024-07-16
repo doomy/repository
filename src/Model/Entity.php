@@ -18,8 +18,6 @@ abstract class Entity
 
     public const ?string PRIMARY_KEY = null;
 
-    protected bool $created = false;
-
     /**
      * @var array<string, string>
      */
@@ -60,16 +58,6 @@ abstract class Entity
     public function __toString(): string
     {
         return '';
-    }
-
-    public function setCreated(bool $created): void
-    {
-        $this->created = $created;
-    }
-
-    public function wasCreated(): bool
-    {
-        return $this->created;
     }
 
     public static function getTableDefinition(): ?TableDefinition

@@ -149,10 +149,7 @@ readonly class Repository
         // unset($values[$this->identityColumn]);
         $newId = $this->add($values);
         $values[$this->identityColumn] = $newId;
-        $entity = $this->entityFactory->createEntity($this->entityClass, $values);
-        $entity->setCreated(true);
-        return $entity;
-
+        return $this->entityFactory->createEntity($this->entityClass, $values);
     }
 
     public function getNextId(): mixed
