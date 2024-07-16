@@ -14,7 +14,7 @@ abstract class Entity
 
     public const ?string SEQUENCE = null;
 
-    public const string IDENTITY_COLUMN = 'ID';
+    public const string IDENTITY_COLUMN = 'id';
 
     public const ?string PRIMARY_KEY = null;
 
