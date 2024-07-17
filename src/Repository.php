@@ -8,6 +8,7 @@ use Dibi\Exception;
 use Doomy\CustomDibi\Connection;
 use Doomy\Repository\Helper\DbHelper;
 use Doomy\Repository\Model\Entity;
+use Doomy\Repository\TableDefinition\TableDefinition;
 use Doomy\Repository\TableDefinition\TableDefinitionFactory;
 
 /**
@@ -21,6 +22,8 @@ readonly class Repository
 
     private string $identityColumn;
 
+    private TableDefinition $tableDefinition;
+
     /**
      * @param class-string<T> $entityClass
      */
@@ -31,15 +34,15 @@ readonly class Repository
         private DbHelper $dbHelper,
         private TableDefinitionFactory $tableDefinitionFactory
     ) {
-        $tableDefinition = $this->tableDefinitionFactory->createTableDefinition($entityClass);
+        $this->tableDefinition = $this->tableDefinitionFactory->createTableDefinition($entityClass);
 
-        $this->table = $this->view = $tableDefinition->getTableName();
+        $this->table = $this->view = $this->tableDefinition->getTableName();
 
-        if ($tableDefinition->getIdentityColumn() === null) {
+        if ($this->tableDefinition->getIdentityColumn() === null) {
             throw new \Exception('Identity column not found in table definition');
         }
 
-        $this->identityColumn = $tableDefinition->getIdentityColumn()
+        $this->identityColumn = $this->tableDefinition->getIdentityColumn()
             ->getName();
     }
 
@@ -79,69 +82,27 @@ readonly class Repository
      */
     public function findById(string|int $id): ?Entity
     {
-        /** @var T|null $entity */
-        $entity = $this->findBy($this->identityColumn, $id);
-        return $entity;
+        return $this->findBy($this->identityColumn, $id);
     }
 
     /**
-     * @return T|false
-     */
-    public function findBy(string $name, string|int $value): Entity|false
-    {
-        $q = "SELECT * FROM {$this->view} WHERE {$name}='{$value}'";
-        $result = $this->connection->query($q);
-        $all = $result->fetchAll();
-        $values = array_shift($all);
-        if ($values === null) {
-            return false;
-        }
-
-        $entity = $this->entityFactory->createEntity($this->entityClass, $values);
-        return $values ? $entity : false;
-    }
-
-    /**
-     * @param array<string, mixed> $values
-     */
-    public function add(array $values): mixed
-    {
-        $this->connection->query("INSERT INTO {$this->table}", $values);
-        try {
-            return $this->connection->getInsertId();
-        } catch (Exception) {
-            if (isset($values[$this->identityColumn])) {
-                return $values[$this->identityColumn];
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * @param array<string,mixed> $values
-     */
-    public function update(int|string $id, array $values): void
-    {
-        $this->connection->query("UPDATE {$this->table} SET ", $values, "WHERE {$this->identityColumn} = '{$id}'");
-    }
-
-    /**
-     * @param array<string, mixed> $values
+     * @param array<string, mixed>|T $values
      * @return T
      */
-    public function save(array $values): Entity
+    public function save(array|Entity $values): Entity
     {
-        if (isset($values[$this->identityColumn]) && $values[$this->identityColumn]) {
-            /** @var int|string $id */
-            $id = $values[$this->identityColumn];
-            $entity = $this->findById($id);
+        if ($values instanceof Entity) {
+            $values = $this->convertEntityToValues($values);
         }
 
-        if (isset($entity)) {
-            $this->update($entity->{$this->identityColumn}, $values);
+        $id = $values[$this->identityColumn] ?? null;
+        $entity = is_string($id) || is_int($id) ? $this->findById($id) : null;
+
+        if ($entity !== null) {
+            $this->update($entity->{$this->getIdentityColumnGetter()}(), $values);
             return $this->entityFactory->createEntity($this->entityClass, $values);
         }
+
         $newId = $this->add($values);
         $values[$this->identityColumn] = $newId;
         return $this->entityFactory->createEntity($this->entityClass, $values);
@@ -161,5 +122,64 @@ readonly class Repository
     {
         $where = $this->dbHelper->translateWhere($where);
         $this->connection->query("DELETE FROM {$this->table} WHERE {$where}");
+    }
+
+    /**
+     * @return T|null
+     */
+    private function findBy(string $name, string|int $value): ?Entity
+    {
+        $q = "SELECT * FROM {$this->view} WHERE {$name}='{$value}'";
+        $result = $this->connection->query($q);
+        $all = $result->fetchAll();
+        $values = array_shift($all);
+        if ($values === null) {
+            return null;
+        }
+
+        $entity = $this->entityFactory->createEntity($this->entityClass, $values);
+        return $values ? $entity : null;
+    }
+
+    /**
+     * @param array<string, mixed> $values
+     */
+    private function add(array $values): mixed
+    {
+        $this->connection->query("INSERT INTO {$this->table}", $values);
+        try {
+            return $this->connection->getInsertId();
+        } catch (Exception) {
+            if (isset($values[$this->identityColumn])) {
+                return $values[$this->identityColumn];
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param array<string,mixed> $values
+     */
+    private function update(int|string $id, array $values): void
+    {
+        $this->connection->query("UPDATE {$this->table} SET ", $values, "WHERE {$this->identityColumn} = '{$id}'");
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function convertEntityToValues(Entity $entity): array
+    {
+        $values = [];
+        foreach ($this->tableDefinition->getColumns() as $column) {
+            $values[$column->getName()] = $entity->{'get' . ucfirst($column->getName())}();
+        }
+        return $values;
+    }
+
+    private function getIdentityColumnGetter(): string
+    {
+        return 'get' . ucfirst($this->identityColumn);
     }
 }

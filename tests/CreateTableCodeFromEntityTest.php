@@ -8,7 +8,7 @@ use Doomy\Repository\TableDefinition\TableDefinitionFactory;
 use Doomy\Repository\Helper\DbHelper;
 use PHPUnit\Framework\TestCase;
 
-final class CreateTableFromEntityTest extends TestCase
+final class CreateTableCodeFromEntityTest extends TestCase
 {
     public function testGetCreateCodeFromEntity(): void
     {

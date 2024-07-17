@@ -31,15 +31,19 @@ final readonly class DbHelper
 
         $whereParts = [];
         foreach ($where as $columnName => $expected) {
-            if (is_string(($expected))) {
+            if (is_string(($expected)) || is_int($expected)) {
                 if (is_string($expected) && ($expected[0] === '~')) {
                     $whereParts[] = static::getLikeExpression(
                         $columnName,
                         $this->escapeSingleQuote(substr($expected, 1))
                     );
-                } elseif (is_string($expected)) {
-                    $escapedExpected = $this->escapeSingleQuote($expected);
-                    $whereParts[] = "`{$columnName}` = '{$escapedExpected}'";
+                } else {
+                    if (is_int($expected)) {
+                        $whereParts[] = "`{$columnName}` = {$expected}";
+                    } else {
+                        $escapedExpected = $this->escapeSingleQuote($expected);
+                        $whereParts[] = "`{$columnName}` = '{$escapedExpected}'";
+                    }
                 }
             } elseif ($expected === null) {
                 $whereParts[] = "`{$columnName}` IS NULL";

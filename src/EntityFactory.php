@@ -25,6 +25,6 @@ readonly class EntityFactory
             $values = $values->toArray();
         }
 
-        return new $entityClass($values);
+        return new $entityClass(...$values);
     }
 }

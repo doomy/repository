@@ -11,7 +11,27 @@ use Doomy\Repository\TableDefinition\Attribute\Table;
 final class TestEntity extends Entity {
     #[PrimaryKey]
     #[Identity]
-    private int $intColumn;
+    private ?int $intColumn;
 
     private string $varcharColumn;
+
+    public function __construct(string $varcharColumn, ?int $intColumn = null) {
+        $this->intColumn = $intColumn;
+        $this->varcharColumn = $varcharColumn;
+    }
+
+    public function getIntColumn(): ?int
+    {
+        return $this->intColumn;
+    }
+
+    public function getVarcharColumn(): string
+    {
+        return $this->varcharColumn;
+    }
+
+    public function setVarcharColumn(string $varcharColumn): void
+    {
+        $this->varcharColumn = $varcharColumn;
+    }
 }
