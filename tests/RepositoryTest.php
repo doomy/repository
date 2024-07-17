@@ -18,13 +18,9 @@ final class RepositoryTest extends TestCase
 
     public function __construct(string $name)
     {
-        $this->connection = new Connection([
-            'host' => '127.0.0.1',
-            'user' => 'testuser',
-            'password' => 'testpassword',
-            'database' => 'testing',
-            'port' => 3999
-        ]);
+        $config = json_decode(file_get_contents(__DIR__ . '/../testingDbCredentials.json'), true);
+
+        $this->connection = new Connection($config);
 
         parent::__construct($name);
     }
