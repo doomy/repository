@@ -18,7 +18,7 @@ final class RepositoryTest extends TestCase
 
     public function __construct(string $name)
     {
-        $config = json_decode(file_get_contents(__DIR__ . '/../testingDbCredentials.json'), true);
+        $config = json_decode(file_get_contents(__DIR__ . '/../vendor/doomy/testing/testingDbCredentials.json'), true);
 
         $this->connection = new Connection($config);
 
