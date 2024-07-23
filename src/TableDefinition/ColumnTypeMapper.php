@@ -39,6 +39,7 @@ final class ColumnTypeMapper
             if ($type instanceof \ReflectionNamedType) {
                 return match ($type->getName()) {
                     'DateTime' => ColumnType::TIMESTAMP,
+                    'DateTimeInterface' => ColumnType::TIMESTAMP,
                     default => throw new \InvalidArgumentException('Unsupported type ' . $type->getName()),
                 };
             }
