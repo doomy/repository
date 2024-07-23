@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Doomy\Repository;
 
-use Doomy\CustomDibi\Connection;
+use Dibi\Connection;
 use Doomy\Repository\Helper\DbHelper;
 use Doomy\Repository\Model\Entity;
 use Doomy\Repository\TableDefinition\TableDefinitionFactory;

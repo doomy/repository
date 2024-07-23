@@ -10,8 +10,7 @@
     },
     "require": {
 		"php": ">=8.3",
-		"dibi/dibi": ">=3.0",
-        "doomy/customdibi": "^1.0.2",
+		"dibi/dibi": "^5.0",
         "doomy/stringtools": "^2.0.0"
 	},
 	"minimum-stability": "stable",

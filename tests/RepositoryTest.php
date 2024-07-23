@@ -1,8 +1,7 @@
 <?php
 
 namespace Doomy\Repository\Tests;
-use Dibi\Exception;
-use Doomy\CustomDibi\Connection;
+use Dibi\Connection;
 use Doomy\Repository\EntityFactory;
 use Doomy\Repository\Helper\DbHelper;
 use Doomy\Repository\RepoFactory;
