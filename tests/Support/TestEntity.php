@@ -15,7 +15,11 @@ final class TestEntity extends Entity {
 
     private string $varcharColumn;
 
-    public function __construct(string $varcharColumn, ?int $intColumn = null) {
+    public function __construct(
+        string $varcharColumn,
+        ?int $intColumn = null,
+        private readonly bool $enabled = false
+    ) {
         $this->intColumn = $intColumn;
         $this->varcharColumn = $varcharColumn;
     }
@@ -33,5 +37,10 @@ final class TestEntity extends Entity {
     public function setVarcharColumn(string $varcharColumn): void
     {
         $this->varcharColumn = $varcharColumn;
+    }
+
+    public function isEnabled(): bool
+    {
+        return $this->enabled;
     }
 }

@@ -8,6 +8,8 @@ use Dibi\Connection;
 use Dibi\Exception;
 use Doomy\Repository\Helper\DbHelper;
 use Doomy\Repository\Model\Entity;
+use Doomy\Repository\TableDefinition\Column;
+use Doomy\Repository\TableDefinition\ColumnType;
 use Doomy\Repository\TableDefinition\TableDefinition;
 use Doomy\Repository\TableDefinition\TableDefinitionFactory;
 
@@ -173,7 +175,8 @@ readonly class Repository
     {
         $values = [];
         foreach ($this->tableDefinition->getColumns() as $column) {
-            $values[$column->getName()] = $entity->{'get' . ucfirst($column->getName())}();
+
+            $values[$column->getName()] = $entity->{$this->getGetterName($column)}();
         }
         return $values;
     }
@@ -181,5 +184,31 @@ readonly class Repository
     private function getIdentityColumnGetter(): string
     {
         return 'get' . ucfirst($this->identityColumn);
+    }
+
+    private function getGetterName(Column $column): string
+    {
+        $possibleGetters = $this->getPossibleGetters($column);
+        foreach ($possibleGetters as $getter) {
+            if (method_exists($this->entityClass, $getter)) {
+                return $getter;
+            }
+        }
+        throw new \Exception("Getter for column {$column->getName()} not found in entity {$this->entityClass}");
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getPossibleGetters(Column $column): array
+    {
+        return match ($column->getColumnType()) {
+            ColumnType::BOOLEAN => [
+                'get' . ucfirst($column->getName()),
+                'is' . ucfirst($column->getName()),
+                'has' . ucfirst($column->getName()),
+            ],
+            default => ['get' . ucfirst($column->getName())],
+        };
     }
 }

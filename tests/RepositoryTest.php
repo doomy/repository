@@ -39,7 +39,7 @@ final class RepositoryTest extends TestCase
 
         $entity1 = new TestEntity(intColumn: 1, varcharColumn: 'test1');
         $entity2 = new TestEntity(intColumn: 2, varcharColumn: 'test2');
-        $entity3 = new TestEntity(varcharColumn: 'test3');
+        $entity3 = new TestEntity(varcharColumn: 'test3', enabled: true);
 
         $repository->save($entity1);
         $repository->save($entity2);
@@ -59,6 +59,7 @@ final class RepositoryTest extends TestCase
         $foundEntity3 = array_shift($foundAll);
         Assert::assertEquals(3, $foundEntity3->getIntColumn()); // testing auto_increment
         Assert::assertEquals('test3', $foundEntity3->getVarcharColumn());
+        Assert::assertEquals(true, $foundEntity3->isEnabled());
 
 
         $entitiesFiltered = $repository->findAll(['intColumn' => 1]);

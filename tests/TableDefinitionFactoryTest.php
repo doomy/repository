@@ -23,7 +23,7 @@ final class TableDefinitionFactoryTest extends TestCase
         $columns = $tableDefinition->getColumns();
 
         $this->assertEquals('test_table', $tableDefinition->getTableName());
-        $this->assertCount(2, $columns);
+        $this->assertCount(3, $columns);
 
         $this->assertEquals('intColumn', $columns[0]->getName());
         $this->assertEquals(ColumnType::INTEGER, $columns[0]->getColumnType());
