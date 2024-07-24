@@ -28,7 +28,7 @@ final class RepositoryTest extends TestCase
     {
         $tableDefinitionFactory = new TableDefinitionFactory(new ColumnTypeMapper());
         $dbHelper = new DbHelper(new ColumnTypeMapper());
-        $entityFactory = new EntityFactory();
+        $entityFactory = new EntityFactory($tableDefinitionFactory);
         $repoFactory = new RepoFactory($this->connection, $entityFactory, $dbHelper, $tableDefinitionFactory);
         $repository = $repoFactory->getRepository(TestEntity::class);
 
