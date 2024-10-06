@@ -30,12 +30,14 @@ final class TableDefinitionFactoryTest extends TestCase
         $this->assertEquals(null, $columns[0]->getLength());
         $this->assertTrue($columns[0]->isPrimaryKey());
         $this->assertTrue($columns[0]->isIdentity());
+        $this->assertFalse($columns[0]->isUnique());
 
         $this->assertEquals('varcharColumn', $columns[1]->getName());
         $this->assertEquals(ColumnType::VARCHAR, $columns[1]->getColumnType());
         $this->assertEquals(255, $columns[1]->getLength());
         $this->assertFalse($columns[1]->isPrimaryKey());
         $this->assertFalse($columns[1]->isIdentity());
+        $this->assertTrue($columns[1]->isUnique());
     }
 }
 

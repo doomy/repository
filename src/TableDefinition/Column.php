@@ -15,6 +15,7 @@ final class Column
         private bool $isPrimaryKey = false,
         private bool $isIdentity = false,
         private bool $nullable = false,
+        private bool $isUnique = false,
     ) {
         if ($columnType === ColumnType::VARCHAR && $length === null) {
             $this->length = self::DEFAULT_VARCHAR_LENGTH;
@@ -49,5 +50,10 @@ final class Column
     public function isNullable(): bool
     {
         return $this->nullable;
+    }
+
+    public function isUnique(): bool
+    {
+        return $this->isUnique;
     }
 }

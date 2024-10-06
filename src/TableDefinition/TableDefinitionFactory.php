@@ -9,6 +9,7 @@ use Doomy\Repository\TableDefinition\Attribute\AbstractTableDefinitionAttribute;
 use Doomy\Repository\TableDefinition\Attribute\Column\AbstractTableDefinitionPropertyAttribute;
 use Doomy\Repository\TableDefinition\Attribute\Column\Identity;
 use Doomy\Repository\TableDefinition\Attribute\Column\PrimaryKey;
+use Doomy\Repository\TableDefinition\Attribute\Column\Unique;
 use Doomy\Repository\TableDefinition\Attribute\Table;
 
 final readonly class TableDefinitionFactory
@@ -58,12 +59,14 @@ final readonly class TableDefinitionFactory
             $attributes = $this->getPropertyAttributes($property);
             $isPrimaryKey = false;
             $isIdentity = false;
+            $isUnique = false;
             foreach ($attributes as $attribute) {
                 if ($attribute instanceof PrimaryKey) {
                     $isPrimaryKey = true;
-                }
-                if ($attribute instanceof Identity) {
+                } elseif ($attribute instanceof Identity) {
                     $isIdentity = true;
+                } elseif ($attribute instanceof Unique) {
+                    $isUnique = true;
                 }
             }
 
@@ -72,7 +75,8 @@ final readonly class TableDefinitionFactory
                 columnType: $this->columnTypeMapper->mapFromReflectionProperty($property),
                 length: null,
                 isPrimaryKey: $isPrimaryKey,
-                isIdentity: $isIdentity
+                isIdentity: $isIdentity,
+                isUnique: $isUnique
             );
         }
         return $columns;
