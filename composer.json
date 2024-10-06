@@ -17,12 +17,11 @@
     "require-dev": {
         "symplify/easy-coding-standard": "^12.3",
         "phpstan/phpstan": "^1.11",
-        "phpunit/phpunit": "^11.2",
-        "doomy/testing": "^1.0.0"
+        "phpunit/phpunit": "^11.2"
     },
     "scripts": {
         "check": "php vendor/bin/phpstan analyse src --level 9 && php vendor/bin/ecs --fix && php vendor/phpunit/phpunit/phpunit tests --bootstrap vendor/autoload.php --colors --stop-on-error --stop-on-failure",
-        "tests-up": "vendor/doomy/testing/bin/tests-up.sh",
-        "tests-down": "vendor/doomy/testing/bin/tests-down.sh"
+        "tests-up": "bin/tests-up.sh",
+        "tests-down": "bin/tests-down.sh"
     }
 }
