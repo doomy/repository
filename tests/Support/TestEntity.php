@@ -9,7 +9,7 @@ use Doomy\Repository\TableDefinition\Attribute\Column\Unique;
 use Doomy\Repository\TableDefinition\Attribute\Table;
 
 #[Table('test_table')]
-final class TestEntity extends Entity {
+class TestEntity extends Entity {
     #[PrimaryKey]
     #[Identity]
     private ?int $intColumn;
