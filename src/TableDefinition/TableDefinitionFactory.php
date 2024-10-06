@@ -27,7 +27,7 @@ final readonly class TableDefinitionFactory
     {
         $classReflection = new \ReflectionClass($entityClass);
         $attributes = $this->getClassAttributes($classReflection);
-        $properties = $classReflection->getProperties();
+        $properties = $this->getHierarchyProperties($classReflection);
         $columns = $this->createColumnsFromProperties($properties);
 
         $primaryKey = $identity = null;
@@ -98,6 +98,11 @@ final readonly class TableDefinitionFactory
                 $attributes[] = $instance;
             }
         }
+
+        if ($reflectionClass->getParentClass() !== false) {
+            $attributes = array_merge($attributes, $this->getClassAttributes($reflectionClass->getParentClass()));
+        }
+
         return $attributes;
     }
 
@@ -115,6 +120,7 @@ final readonly class TableDefinitionFactory
                 $attributes[] = $instance;
             }
         }
+
         return $attributes;
     }
 
@@ -129,5 +135,19 @@ final readonly class TableDefinitionFactory
             }
         }
         throw new \Exception('Table name not found');
+    }
+
+    /**
+     * @template T of Entity
+     * @param \ReflectionClass<T> $reflectionClass
+     * @return \ReflectionProperty[]
+     */
+    private function getHierarchyProperties(\ReflectionClass $reflectionClass): array
+    {
+        $properties = $reflectionClass->getProperties();
+        if ($reflectionClass->getParentClass() !== false) {
+            $properties = array_merge($properties, $this->getHierarchyProperties($reflectionClass->getParentClass()));
+        }
+        return $properties;
     }
 }
