@@ -19,7 +19,7 @@ final class CreateTableCodeFromEntityTest extends TestCase
 
         $createCode = $dbHelper->getCreateTable($tableDefinition);
         $this->assertEquals(
-            'CREATE TABLE test_table (intColumn INT NOT NULL AUTO_INCREMENT, varcharColumn VARCHAR(255) NOT NULL, enabled BOOLEAN NOT NULL, PRIMARY KEY(intColumn));',
+            'CREATE TABLE test_table (intColumn INT NOT NULL AUTO_INCREMENT, varcharColumn VARCHAR(255) NOT NULL UNIQUE, enabled BOOLEAN NOT NULL, PRIMARY KEY(intColumn));',
             $createCode
         );
     }

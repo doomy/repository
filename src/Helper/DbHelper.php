@@ -131,6 +131,10 @@ final readonly class DbHelper
                 $columnDefinition .= ' NULL';
             }
 
+            if ($column->isUnique()) {
+                $columnDefinition .= ' UNIQUE';
+            }
+
             $columnCodes[] = "{$column->getName()} {$columnDefinition}";
         }
 
