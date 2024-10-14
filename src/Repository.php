@@ -88,24 +88,35 @@ readonly class Repository
     }
 
     /**
-     * @param array<string, mixed>|T $values
+     * @param T $entity
      * @return T
      */
-    public function save(array|Entity $values): Entity
+    public function save(Entity $entity): Entity
     {
-        if ($values instanceof Entity) {
-            $values = $this->convertEntityToValues($values);
+        if ($entity instanceof Entity) {
+            $values = $this->convertEntityToValues($entity);
         }
 
         $id = $values[$this->identityColumn] ?? null;
-        $entity = is_string($id) || is_int($id) ? $this->findById($id) : null;
+        $existingEntity = is_string($id) || is_int($id) ? $this->findById($id) : null;
 
-        if ($entity !== null) {
-            $this->update($entity->{$this->getIdentityColumnGetter()}(), $values);
-            return $this->entityFactory->createEntity($this->entityClass, $values);
+        if ($existingEntity !== null) {
+            $this->update($existingEntity->{$this->getIdentityColumnGetter()}(), $values);
+            return $entity;
         }
 
         $newId = $this->add($values);
+
+        // check if we can set the original entity ID. If yes, we return the original reference. Otherwise, a clone is returned with the new ID
+        $identitySetterMethod = $this->getIdentityColumnSetter();
+        if (method_exists($entity, $identitySetterMethod) && (new \ReflectionMethod(
+            $entity,
+            $identitySetterMethod
+        ))->isPublic()) {
+            $entity->{$identitySetterMethod}($newId);
+            return $entity;
+        }
+
         $values[$this->identityColumn] = $newId;
         return $this->entityFactory->createEntity($this->entityClass, $values);
     }
@@ -184,6 +195,11 @@ readonly class Repository
     private function getIdentityColumnGetter(): string
     {
         return 'get' . ucfirst($this->identityColumn);
+    }
+
+    private function getIdentityColumnSetter(): string
+    {
+        return 'set' . ucfirst($this->identityColumn);
     }
 
     private function getGetterName(Column $column): string

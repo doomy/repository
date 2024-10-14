@@ -45,4 +45,9 @@ class TestEntity extends Entity {
     {
         return $this->enabled;
     }
+
+    public function setIntColumn(int $intColumn): void
+    {
+        $this->intColumn = $intColumn;
+    }
 }

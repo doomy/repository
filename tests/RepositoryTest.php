@@ -45,6 +45,8 @@ final class RepositoryTest extends TestCase
         $repository->save($entity2);
         $repository->save($entity3);
 
+        Assert::assertIsInt($entity3->getIntColumn());
+
         $foundAll = $repository->findAll();
         Assert::assertCount(3, $foundAll);
 
