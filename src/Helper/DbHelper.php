@@ -114,6 +114,8 @@ final readonly class DbHelper
     {
         $columnCodes = [];
 
+        $this->sortColumns($columns);
+
         foreach ($columns as $column) {
             $typeTranslated = $this->columnTypeMapper->mapToMysqlString($column->getColumnType());
 
@@ -144,5 +146,21 @@ final readonly class DbHelper
     private function escapeSingleQuote(string $string): string
     {
         return str_replace("'", "''", $string);
+    }
+
+    /**
+     * @param Column[] $columns
+     */
+    private function sortColumns(array &$columns): void
+    {
+        usort($columns, function (Column $a, Column $b) {
+            if ($a->isIdentity()) {
+                return -1;
+            }
+            if ($b->isIdentity()) {
+                return 1;
+            }
+            return 0;
+        });
     }
 }
