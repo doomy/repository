@@ -10,12 +10,12 @@ use Doomy\Repository\TableDefinition\Attribute\Table;
 
 #[Table('test_table')]
 class TestEntity extends Entity {
+    #[Unique]
+    private string $varcharColumn;
+
     #[PrimaryKey]
     #[Identity]
     private ?int $intColumn;
-
-    #[Unique]
-    private string $varcharColumn;
 
     public function __construct(
         string $varcharColumn,
