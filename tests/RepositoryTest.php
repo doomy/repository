@@ -89,6 +89,7 @@ final class RepositoryTest extends TestCase
             $entity1->getIntColumn() => $entity1,
             $entity2->getIntColumn() => $entity2
         ], $entitiesFoundById);
+        Assert::assertSame(1, $repository->getEntityId($entity1));
 
         $repository->deleteById(3);
         Assert::assertCount(2, $repository->findAll());
