@@ -83,6 +83,13 @@ final class RepositoryTest extends TestCase
         Assert::assertEquals(3, $repository->count());
         Assert::assertEquals(2, $repository->count('intColumn <= 2'));
 
+        $entitiesFoundById = $repository->findByIds([1, 2]);
+        Assert::assertCount(2, $entitiesFoundById);
+        Assert::assertEquals([
+            $entity1->getIntColumn() => $entity1,
+            $entity2->getIntColumn() => $entity2
+        ], $entitiesFoundById);
+
         $repository->deleteById(3);
         Assert::assertCount(2, $repository->findAll());
 

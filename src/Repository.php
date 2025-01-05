@@ -88,6 +88,17 @@ readonly class Repository
     }
 
     /**
+     * @param string[]|int[] $ids
+     * @return array<int|string, T>
+     */
+    public function findByIds(array $ids): array
+    {
+        return $this->findAll([
+            $this->identityColumn => $ids,
+        ]);
+    }
+
+    /**
      * @param T $entity
      * @return T
      */
