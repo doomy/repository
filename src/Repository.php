@@ -160,6 +160,11 @@ readonly class Repository
         return is_int($count) ? $count : 0;
     }
 
+    public function getEntityId(Entity $entity): int|string
+    {
+        return $entity->{$this->getIdentityColumnGetter()}();
+    }
+
     /**
      * @return T|null
      */
