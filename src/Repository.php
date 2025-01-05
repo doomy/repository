@@ -138,6 +138,18 @@ readonly class Repository
     }
 
     /**
+     * @param array<string, mixed>|string|null $where
+     */
+    public function count(array|string|null $where = null): int
+    {
+        $where = $this->dbHelper->translateWhere($where);
+        $sql = "SELECT COUNT(*) FROM {$this->view} WHERE {$where}";
+        $result = $this->connection->query($sql);
+        $count = $result->fetchSingle();
+        return is_int($count) ? $count : 0;
+    }
+
+    /**
      * @return T|null
      */
     private function findBy(string $name, string|int $value): ?Entity

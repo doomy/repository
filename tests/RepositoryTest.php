@@ -80,6 +80,8 @@ final class RepositoryTest extends TestCase
         $repository->save($entityFoundById);
         $entityUpdated = $repository->findById(3);
         Assert::assertEquals('test 3 updated', $entityUpdated->getVarcharColumn());
+        Assert::assertEquals(3, $repository->count());
+        Assert::assertEquals(2, $repository->count('intColumn <= 2'));
 
         $repository->deleteById(3);
         Assert::assertCount(2, $repository->findAll());
