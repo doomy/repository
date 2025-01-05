@@ -49,7 +49,7 @@ final readonly class DbHelper
                 $whereParts[] = "`{$columnName}` IS NULL";
             } elseif (is_array($expected)) {
                 foreach ($expected as &$expectedValue) {
-                    $expectedValueEscaped = $this->escapeSingleQuote($expectedValue);
+                    $expectedValueEscaped = $this->escapeSingleQuote((string) $expectedValue);
                     $expectedValue = "'{$expectedValueEscaped}'"; // escape
                 }
                 $expectedCode = implode(', ', $expected);
